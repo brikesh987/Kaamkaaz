@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:minWidth="25px"
+    android:minHeight="25px">	
+<LinearLayout
+			xmlns:android="http://schemas.android.com/apk/res/android"
+			android:orientation="vertical"			
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">	
+		<TextView
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="20dip"
+			android:text="Name"
+			android:textSize="20dp"
+		/>
+		<EditText
+			android:id="@+id/edittext"
+			android:layout_width="match_parent"
+			android:hint="Enter message for the request"					
+			android:background="#4CAF50"
+		/>
+		<Button
+			android:text="Register"
+		/>
+</LinearLayout>
+</FrameLayout>

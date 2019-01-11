@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">HelloSpinner</string>
+  <string name="planet_prompt"></string>
+  <string-array name="planets_array">
+    <item>Choose a service</item>
+    <item>Autoriksha</item>
+    <item>Electrician</item>
+    <item>Plumber</item>
+    <item>Taxi</item>
+    <item>Driver</item>
+    <item>Housemaid</item>
+    <item>Grocery Store</item>
+    <item>Painter</item>
+    <item>Caterer</item>
+    <item>Mechanic</item>
+    <item>Tutor</item>    
+    <item>Volunteer</item>
+  </string-array>
+</resources>
