@@ -9,10 +9,10 @@
     using System;
 
     /// <summary>
-    /// Defines the <see cref="RegisterActivity" />
+    /// Defines the <see cref="FeedbackActivity" />
     /// </summary>
-    [Activity(Label = "Register", Theme = "@style/MainTheme.Base")]
-    public class RegisterActivity : Android.Support.V7.App.AppCompatActivity
+    [Activity(Label = "Feedback", Theme = "@style/MainTheme.Base")]
+    public class FeedbackActivity : Android.Support.V7.App.AppCompatActivity
     {
         #region Methods
 
@@ -44,11 +44,11 @@
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            SetContentView(Resource.Layout.feedback);
             try
             {
-                SetContentView(Resource.Layout.registeruser);
-                Button sendButton = FindViewById<Button>(Resource.Id.btnRegister);
-                sendButton.Click += delegate { btn_Register(); };
+                Button sendButton = FindViewById<Button>(Resource.Id.btnSendFeedback);
+                sendButton.Click += delegate { btn_Send(); };
                 //Set tool bar
                 var toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
                 SetSupportActionBar(toolbar);
@@ -58,14 +58,14 @@
             }
             catch (Exception ex)
             {
-                Log.Error("Register:", $"Unexpected error :{ex.Message}");
+                Log.Error("Feedback:", $"Unexpected error :{ex.Message}");
             }
         }
 
         /// <summary>
-        /// The btn_Register
+        /// The btn_Send
         /// </summary>
-        private void btn_Register()
+        private void btn_Send()
         {
         }
 
@@ -80,19 +80,19 @@
             if (prevActivity == "main")
             {
                 Intent intent = new Intent(this, typeof(MainActivity));
-                intent.PutExtra("activity", "register");
+                intent.PutExtra("activity", "feedback");
                 StartActivity(intent);
             }
-            if (prevActivity == "feedback")
+            if (prevActivity == "register")
             {
-                Intent intent = new Intent(this, typeof(FeedbackActivity));
-                intent.PutExtra("activity", "register");
+                Intent intent = new Intent(this, typeof(RegisterActivity));
+                intent.PutExtra("activity", "feedback");
                 StartActivity(intent);
             }
             if (prevActivity == "messages")
             {
                 Intent intent = new Intent(this, typeof(Message));
-                intent.PutExtra("activity", "register");
+                intent.PutExtra("activity", "feedback");
                 StartActivity(intent);
             }
         }
@@ -107,19 +107,19 @@
             if (e.Item.ItemId == Resource.Id.menu_messages)
             {
                 Intent intent = new Intent(this, typeof(MessagesActivity));
-                intent.PutExtra("activity", "register");
+                intent.PutExtra("activity", "feedback");
                 StartActivity(intent);
             }
             if (e.Item.ItemId == Resource.Id.menu_feedback)
             {
                 Intent intent = new Intent(this, typeof(FeedbackActivity));
-                intent.PutExtra("activity", "register");
+                intent.PutExtra("activity", "feedback");
                 StartActivity(intent);
             }
             if (e.Item.ItemId == Resource.Id.menu_register)
             {
                 Intent intent = new Intent(this, typeof(RegisterActivity));
-                intent.PutExtra("activity", "register");
+                intent.PutExtra("activity", "feedback");
                 StartActivity(intent);
             }
         }

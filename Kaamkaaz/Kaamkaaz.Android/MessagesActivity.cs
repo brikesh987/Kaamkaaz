@@ -5,14 +5,13 @@
     using Android.OS;
     using Android.Util;
     using Android.Views;
-    using Android.Widget;
     using System;
 
     /// <summary>
-    /// Defines the <see cref="RegisterActivity" />
+    /// Defines the <see cref="MessagesActivity" />
     /// </summary>
-    [Activity(Label = "Register", Theme = "@style/MainTheme.Base")]
-    public class RegisterActivity : Android.Support.V7.App.AppCompatActivity
+    [Activity(Label = "Messages", Theme = "@style/MainTheme.Base")]
+    public class MessagesActivity : Android.Support.V7.App.AppCompatActivity
     {
         #region Methods
 
@@ -44,12 +43,11 @@
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
+            // Create your application here
             try
             {
-                SetContentView(Resource.Layout.registeruser);
-                Button sendButton = FindViewById<Button>(Resource.Id.btnRegister);
-                sendButton.Click += delegate { btn_Register(); };
-                //Set tool bar
+                SetContentView(Resource.Layout.messages);
                 var toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
                 SetSupportActionBar(toolbar);
                 toolbar.SetNavigationIcon(Resource.Drawable.abc_ic_ab_back_material);
@@ -58,15 +56,9 @@
             }
             catch (Exception ex)
             {
-                Log.Error("Register:", $"Unexpected error :{ex.Message}");
+                Log.Error("Message Activity:", $"Unexpected error :{ex.Message}");
             }
-        }
-
-        /// <summary>
-        /// The btn_Register
-        /// </summary>
-        private void btn_Register()
-        {
+            
         }
 
         /// <summary>
@@ -80,19 +72,19 @@
             if (prevActivity == "main")
             {
                 Intent intent = new Intent(this, typeof(MainActivity));
-                intent.PutExtra("activity", "register");
+                intent.PutExtra("activity", "messages");
+                StartActivity(intent);
+            }
+            if (prevActivity == "register")
+            {
+                Intent intent = new Intent(this, typeof(RegisterActivity));
+                intent.PutExtra("activity", "messages");
                 StartActivity(intent);
             }
             if (prevActivity == "feedback")
             {
                 Intent intent = new Intent(this, typeof(FeedbackActivity));
-                intent.PutExtra("activity", "register");
-                StartActivity(intent);
-            }
-            if (prevActivity == "messages")
-            {
-                Intent intent = new Intent(this, typeof(Message));
-                intent.PutExtra("activity", "register");
+                intent.PutExtra("activity", "messages");
                 StartActivity(intent);
             }
         }
@@ -107,19 +99,19 @@
             if (e.Item.ItemId == Resource.Id.menu_messages)
             {
                 Intent intent = new Intent(this, typeof(MessagesActivity));
-                intent.PutExtra("activity", "register");
+                intent.PutExtra("activity", "messages");
                 StartActivity(intent);
             }
             if (e.Item.ItemId == Resource.Id.menu_feedback)
             {
                 Intent intent = new Intent(this, typeof(FeedbackActivity));
-                intent.PutExtra("activity", "register");
+                intent.PutExtra("activity", "messages");
                 StartActivity(intent);
             }
             if (e.Item.ItemId == Resource.Id.menu_register)
             {
                 Intent intent = new Intent(this, typeof(RegisterActivity));
-                intent.PutExtra("activity", "register");
+                intent.PutExtra("activity", "messages");
                 StartActivity(intent);
             }
         }
