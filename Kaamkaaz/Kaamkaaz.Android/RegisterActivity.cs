@@ -3,10 +3,17 @@
     using Android.App;
     using Android.Content;
     using Android.OS;
+    using Android.Support.Design.Widget;
+    using Android.Text;
     using Android.Util;
     using Android.Views;
+    using Android.Views.InputMethods;
     using Android.Widget;
+    using Kaamkaaz.Models;
+    using Kaamkaaz.Services;
     using System;
+    using System.Collections.Generic;
+    using System.Threading;
 
     /// <summary>
     /// Defines the <see cref="RegisterActivity" />
@@ -47,7 +54,7 @@
             try
             {
                 SetContentView(Resource.Layout.registeruser);
-                Button sendButton = FindViewById<Button>(Resource.Id.btnRegister);
+                FloatingActionButton sendButton = FindViewById<FloatingActionButton>(Resource.Id.btnregister);
                 sendButton.Click += delegate { btn_Register(); };
                 //Set tool bar
                 var toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
@@ -55,6 +62,15 @@
                 toolbar.SetNavigationIcon(Resource.Drawable.abc_ic_ab_back_material);
                 toolbar.MenuItemClick += Toolbar_MenuItemClick;
                 toolbar.NavigationClick += Naviagtion_Clicked;
+
+                //clear focus and set char limit
+                var nameText = FindViewById<EditText>(Resource.Id.username);
+                nameText.SetFilters(new IInputFilter[] { new InputFilterLengthFilter(70) });
+                nameText.ClearFocus();
+
+                var phoneText = FindViewById<EditText>(Resource.Id.phonenumber);
+                phoneText.SetFilters(new IInputFilter[] { new InputFilterLengthFilter(10) });
+                phoneText.ClearFocus();
             }
             catch (Exception ex)
             {
@@ -67,6 +83,19 @@
         /// </summary>
         private void btn_Register()
         {
+            //Disable the keyboard
+            InputMethodManager imm = (InputMethodManager)GetSystemService(Context.InputMethodService);
+            var focus = Window.CurrentFocus;
+            imm.HideSoftInputFromWindow(focus.WindowToken, 0);
+            //Show progressbar on UI thread
+            ShowProgressBar(true);
+            //Start message processing on another thread
+            System.Threading.ThreadStart processMessage = new System.Threading.ThreadStart(SaveProfile);
+            Thread myThread = new Thread(processMessage);
+            myThread.Start();
+            //Stop the progress on UI thread
+            ShowProgressBar(false);
+            ShowDialog("Message", $"Thank your! Your information is saved.");
         }
 
         /// <summary>
@@ -95,6 +124,104 @@
                 intent.PutExtra("activity", "register");
                 StartActivity(intent);
             }
+        }
+
+        /// <summary>
+        /// The SaveProfile
+        /// </summary>
+        private void SaveProfile()
+        {
+            var txtName = FindViewById<EditText>(Resource.Id.textName);
+            var txtPhone = FindViewById<EditText>(Resource.Id.textPhone);
+            var profile = new Profile();
+            List<string> services = new List<string>();
+            var auto = FindViewById<Switch>(Resource.Id.auto);
+            if (auto.Checked)
+            {
+                profile.Services.Add(auto.Text);
+            }
+            var drive = FindViewById<Switch>(Resource.Id.driver);
+            if (drive.Checked)
+            {
+                profile.Services.Add(drive.Text);
+            }
+            var electrician = FindViewById<Switch>(Resource.Id.electrician);
+            if (electrician.Checked)
+            {
+                profile.Services.Add(electrician.Text);
+            }
+            var grocery = FindViewById<Switch>(Resource.Id.grocery);
+            if (electrician.Checked)
+            {
+                profile.Services.Add(grocery.Text);
+            }
+            var maid = FindViewById<Switch>(Resource.Id.maid);
+            if (maid.Checked)
+            {
+                profile.Services.Add(maid.Text);
+            }
+            var mechanic = FindViewById<Switch>(Resource.Id.mechanic);
+            if (mechanic.Checked)
+            {
+                profile.Services.Add(mechanic.Text);
+            }
+            var plumber = FindViewById<Switch>(Resource.Id.plumber);
+            if (plumber.Checked)
+            {
+                profile.Services.Add(plumber.Text);
+            }
+            var painter = FindViewById<Switch>(Resource.Id.painter);
+            if (painter.Checked)
+            {
+                profile.Services.Add(painter.Text);
+            }
+            var taxi = FindViewById<Switch>(Resource.Id.taxi);
+            if (taxi.Checked)
+            {
+                profile.Services.Add(taxi.Text);
+            }
+            var tutor = FindViewById<Switch>(Resource.Id.tutor);
+            if (tutor.Checked)
+            {
+                profile.Services.Add(tutor.Text);
+            }
+            var volunteer = FindViewById<Switch>(Resource.Id.volunteer);
+            if (volunteer.Checked)
+            {
+                profile.Services.Add(volunteer.Text);
+            }
+            KaamkaazService.SaveProfile(profile);
+        }
+
+        /// <summary>
+        /// The ShowDialog
+        /// </summary>
+        /// <param name="title">The title<see cref="string"/></param>
+        /// <param name="message">The message<see cref="string"/></param>
+        private void ShowDialog(string title, string message)
+        {
+            var builder = new AlertDialog.Builder(this);
+
+            builder.SetTitle(title)
+                   .SetMessage(message)
+                   //.SetPositiveButton("Yes", delegate { Console.WriteLine("Yes"); })
+                   .SetNegativeButton("Ok", delegate { Console.WriteLine("No"); });
+
+            builder.Create().Show();
+        }
+
+        /// <summary>
+        /// The ShowProgressBar
+        /// </summary>
+        /// <param name="show">The show<see cref="bool"/></param>
+        private void ShowProgressBar(bool show)
+        {
+            RunOnUiThread(() =>
+            {
+                ProgressBar probar = FindViewById<ProgressBar>(Resource.Id.progressbar);
+                probar.Visibility = show ? ViewStates.Visible : ViewStates.Invisible;
+
+            });
         }
 
         /// <summary>

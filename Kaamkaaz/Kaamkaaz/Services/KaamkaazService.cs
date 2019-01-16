@@ -30,5 +30,10 @@ namespace Kaamkaaz.Services
             list.Add("Volunteer");
             return list;
         }
+
+        public static void SaveProfile(Profile profile)
+        {
+            
+        }
     }
 }
