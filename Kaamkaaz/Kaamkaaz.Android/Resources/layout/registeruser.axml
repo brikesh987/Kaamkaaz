@@ -107,7 +107,7 @@
 					android:text="Autoriksha"
 					android:layout_marginRight="15dp"
 					android:layout_marginLeft="15dp"					
-					style="@android:style/TextAppearance.Medium"
+					style="@android:style/TextAppearance.Large"					
 					/>
 			</android.support.design.widget.TextInputLayout>
 				<View            
@@ -128,7 +128,7 @@
 					android:text="Caterer"
 					android:layout_marginRight="15dp"
 					android:layout_marginLeft="15dp"
-					style="@android:style/TextAppearance.Medium"
+					style="@android:style/TextAppearance.Large"
 					/>	
 			</android.support.design.widget.TextInputLayout>
 				<View            
@@ -149,7 +149,7 @@
 					android:text="Driver"
 					android:layout_marginRight="15dp"
 					android:layout_marginLeft="15dp"
-					style="@android:style/TextAppearance.Medium"
+					style="@android:style/TextAppearance.Large"			
 					/>	
 			</android.support.design.widget.TextInputLayout>
 				<View            
@@ -170,7 +170,7 @@
 					android:text="Electrician"
 					android:layout_marginRight="15dp"
 					android:layout_marginLeft="15dp"
-					style="@android:style/TextAppearance.Medium"
+					style="@android:style/TextAppearance.Large"
 					/>
 			</android.support.design.widget.TextInputLayout>
 				<View            
@@ -191,7 +191,7 @@
 				android:text="Grocery Store"
 				android:layout_marginRight="15dp"
 				android:layout_marginLeft="15dp"
-				style="@android:style/TextAppearance.Medium"
+				style="@android:style/TextAppearance.Large"
 				/> 
 			</android.support.design.widget.TextInputLayout>
 				<View            
@@ -212,7 +212,7 @@
 				android:text="Housemaid"
 				android:layout_marginRight="15dp"
 				android:layout_marginLeft="15dp"
-				style="@android:style/TextAppearance.Medium"
+				style="@android:style/TextAppearance.Large"
 				/>
 			</android.support.design.widget.TextInputLayout>
 				<View            
@@ -233,7 +233,7 @@
 				android:text="Mechanic"
 				android:layout_marginRight="15dp"
 				android:layout_marginLeft="15dp"
-				style="@android:style/TextAppearance.Medium"
+				style="@android:style/TextAppearance.Large"
 				/>
 			</android.support.design.widget.TextInputLayout>
 				<View            
@@ -254,7 +254,7 @@
 				android:text="Plumber"
 				android:layout_marginRight="15dp"
 				android:layout_marginLeft="15dp"
-				style="@android:style/TextAppearance.Medium"
+				style="@android:style/TextAppearance.Large"
 				/>
 			</android.support.design.widget.TextInputLayout>
 				<View            
@@ -275,7 +275,7 @@
 				android:text="Painter"
 				android:layout_marginRight="15dp"
 				android:layout_marginLeft="15dp"
-				style="@android:style/TextAppearance.Medium"
+				style="@android:style/TextAppearance.Large"
 				/>
 			</android.support.design.widget.TextInputLayout>
 				<View            
@@ -296,7 +296,7 @@
 				android:text="Taxi"
 				android:layout_marginRight="15dp"
 				android:layout_marginLeft="15dp"
-				style="@android:style/TextAppearance.Medium"
+				style="@android:style/TextAppearance.Large"
 				/>
 			</android.support.design.widget.TextInputLayout>
 				<View            
@@ -317,7 +317,7 @@
 				android:text="Tutor"
 				android:layout_marginRight="15dp"
 				android:layout_marginLeft="15dp"
-				style="@android:style/TextAppearance.Medium"
+				style="@android:style/TextAppearance.Large"
 				/>
 			</android.support.design.widget.TextInputLayout>
 				<View            
@@ -338,7 +338,7 @@
 				android:text="Volunteer"
 				android:layout_marginRight="15dp"
 				android:layout_marginLeft="15dp"
-				style="@android:style/TextAppearance.Medium"
+				style="@android:style/TextAppearance.Large"
 				/>	
 			</android.support.design.widget.TextInputLayout>
 		 </LinearLayout>		
@@ -362,8 +362,7 @@
 			android:layout_gravity="bottom|center"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" 		    
-		    android:layout_marginBottom = "50dp"
-				
+		    android:layout_marginBottom = "50dp"				
 			android:id="@+id/btnregister">
 	</android.support.design.widget.FloatingActionButton>
 </FrameLayout>
