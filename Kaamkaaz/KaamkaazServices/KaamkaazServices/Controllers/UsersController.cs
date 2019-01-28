@@ -18,7 +18,7 @@ namespace KaamkaazServices.Controllers
 
         // GET: api/User/5
         [HttpGet]
-        public User Get(string id)
+        public User Get(int id)
         {
             var respository = new BlueColorDB(configuration.GetConnectionString("BlueColor"));
             return respository.GetUser(id);

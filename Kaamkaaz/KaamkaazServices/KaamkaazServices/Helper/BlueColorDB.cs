@@ -4,6 +4,7 @@
     using KaamkaazServices.Models;
     using Newtonsoft.Json;
     using System;
+    using System.Collections.Generic;
     using System.Data.SqlClient;
     using System.Linq;
 
@@ -81,6 +82,59 @@
             return id;
         }
 
+        /// <summary>
+        /// The GetProvidersInCity
+        /// </summary>
+        /// <param name="city">The city<see cref="string"/></param>
+        /// <returns>The <see cref="List{Location}"/></returns>
+        public List<Location> GetProvidersInCity(string city)
+        {
+            string sql = $@"SELECT UserId, Latitude, Longitude, City, Country,UpdatedOn
+                            FROM UserLocation
+                            WHERE City = '{city}'                            
+                            Group by UserId,Latitude,Longitude,City,Country,UpdatedOn
+                            Order By UpdatedOn desc;
+                            ";
+            var locations = new List<Location>();
+            try
+            {
+                var connection = new SqlConnection(ConnectionString);
+                locations = connection.Query<Location>(sql).ToList();
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return locations;
+        }
+
+        /// <summary>
+        /// The GetUser
+        /// </summary>
+        /// <param name="userId">The userId<see cref="string"/></param>
+        /// <returns>The <see cref="User"/></returns>
+        public User GetUser(int userId)
+        {
+            string sql = $@"SELECT ProfileData, IsActive, Name, Phone, Name, AboutUser
+                            FROM UserProfile
+                            WHERE Id = {userId}";
+            var user = new User();
+            try
+            {
+                var connection = new SqlConnection(ConnectionString);
+                user = connection.Query<User>(sql).Single();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return user;
+        }
+
+        /// <summary>
+        /// The UpdateUser
+        /// </summary>
+        /// <param name="user">The user<see cref="User"/></param>
+        /// <returns>The <see cref="int"/></returns>
         public int UpdateUser(User user)
         {
             string sql = $@" UPDATE UserProfile
@@ -95,7 +149,8 @@
             {
                 var connection = new SqlConnection(ConnectionString);
                 rowsAffected = connection.Execute(sql);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -103,23 +158,6 @@
             return rowsAffected;
         }
 
-        public User GetUser(string userId)
-        {
-            string sql = $@"SELECT ProfileData, IsActive, Name, Phone, Name, AboutUser
-                            FROM UserProfile
-                            WHERE UserId = '{userId}'";
-            var user = new User();
-            try
-            {
-                var connection = new SqlConnection(ConnectionString);
-                user = connection.Query<User>(sql).Single();
-            }catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return user;
-        }
         #endregion
     }
-
 }
