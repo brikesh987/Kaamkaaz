@@ -1,6 +1,7 @@
 ﻿namespace KaamkaazServices.Models
 {
     using System;
+    using System.Text;
 
     /// <summary>
     /// Defines the <see cref="Location" />
@@ -42,6 +43,21 @@
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// The GetCacheKey
+        /// </summary>
+        /// <returns>The <see cref="string"/></returns>
+        public string GetCacheKey()
+        {
+            var builder = new StringBuilder();
+            builder.Append(City);
+            builder.Append("_");
+            builder.Append(Latitude);
+            builder.Append("_");
+            builder.Append(Longitude);
+            return builder.ToString();
+        }
 
         /// <summary>
         /// The IsValid
@@ -90,6 +106,11 @@
         /// Gets or sets the Service
         /// </summary>
         public string Service { get; set; }
+
+        /// <summary>
+        /// Gets or sets the UserId
+        /// </summary>
+        public int UserId { get; internal set; }
 
         #endregion
     }

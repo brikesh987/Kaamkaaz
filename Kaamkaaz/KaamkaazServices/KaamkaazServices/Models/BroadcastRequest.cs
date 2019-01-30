@@ -29,6 +29,8 @@ namespace KaamkaazServices.Models
             {
                 return false;
             }
+            //ToDO: Hack location needs userId. May be the userId can be removed from BroadCastRequest
+            CurrentLocation.UserId = UserId;
             return true;
         }
     }

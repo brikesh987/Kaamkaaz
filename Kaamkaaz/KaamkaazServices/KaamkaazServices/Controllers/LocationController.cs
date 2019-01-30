@@ -30,13 +30,13 @@
         {
             if (location == null || !location.IsValid())
             {
-                return BadRequest();
+                return BadRequest("Location information is not valid.");
             }
             var repository = new BlueColorDB(configuration.GetConnectionString("BlueColor"));
             if (repository.UpdateLocation(location))
                 return Ok();
             else
-                return BadRequest();
+                return BadRequest("An error occurred while processing the request.");
         }
         #endregion
     }

@@ -33,16 +33,22 @@
         /// </summary>
         public string ConnectionString { get; }
 
-        public bool UpdateLocation(Location location)
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// The AddMessageRecipient
+        /// </summary>
+        /// <param name="messageId">The messageId<see cref="int"/></param>
+        /// <param name="recipientId">The recipientId<see cref="int"/></param>
+        /// <returns>The <see cref="int"/></returns>
+        public int AddMessageRecipient(int messageId, int recipientId)
         {
-            string sql = $@"INSERT INTO [UserLocation] (UserId,Latitude,Longitude,City,Country,UpdatedOn) 
+            string sql = $@"INSERT INTO [Recipients] (MessageId,RecipientId) 
                             VALUES (
-                                     {location.UserId},
-                                     {location.Latitude},
-                                     {location.Longitude},
-                                    '{location.City}',
-                                    '{location.Country}',                                    
-                                    '{DateTime.UtcNow}'
+                                     {messageId},                                                                     
+                                     {recipientId}
                                    );
                             SELECT CAST(SCOPE_IDENTITY() as int)";
             int id = -1;
@@ -55,12 +61,9 @@
             {
                 Console.WriteLine(ex.Message);
             }
-            return id > 0;
+
+            return id;
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// The CreateUser
@@ -125,7 +128,8 @@
             {
                 var connection = new SqlConnection(ConnectionString);
                 locations = connection.Query<Location>(sql).ToList();
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -139,7 +143,7 @@
         /// <returns>The <see cref="User"/></returns>
         public User GetUser(int userId)
         {
-            string sql = $@"SELECT ProfileData, IsActive, Name, Phone, Name, AboutUser
+            string sql = $@"SELECT Id,ProfileData, IsActive, Name, Phone, Name, AboutUser
                             FROM UserProfile
                             WHERE Id = {userId}";
             var user = new User();
@@ -153,6 +157,49 @@
                 Console.WriteLine(ex.Message);
             }
             return user;
+        }
+
+        /// <summary>
+        /// The SaveMessage
+        /// </summary>
+        /// <param name="broadcastMessage">The broadcastMessage<see cref="BroadcastRequest"/></param>
+        /// <returns>The <see cref="int"/></returns>
+        public int SaveMessage(BroadcastRequest broadcastMessage)
+        {
+            var locationId = AddLocation(broadcastMessage.CurrentLocation);
+            if (locationId <= 0) return -1;
+            string sql = $@"INSERT INTO [Messages] (CreatorId,CreateDate,FromLocationId,RequestedService,MessageBody) 
+                            VALUES (
+                                     {broadcastMessage.UserId},
+                                     '{DateTime.UtcNow}',                                     
+                                     {locationId},
+                                    '{broadcastMessage.ServiceRequested}',                                    
+                                    '{broadcastMessage.MessageBody}'
+                                   );
+                            SELECT CAST(SCOPE_IDENTITY() as int)";
+            int id = -1;
+            try
+            {
+                var connection = new SqlConnection(ConnectionString);
+                id = connection.Query<int>(sql).Single();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return id;
+        }
+
+        /// <summary>
+        /// The UpdateLocation
+        /// </summary>
+        /// <param name="location">The location<see cref="Location"/></param>
+        /// <returns>The <see cref="bool"/></returns>
+        public bool UpdateLocation(Location location)
+        {
+            int id = AddLocation(location);
+            return id > 0;
         }
 
         /// <summary>
@@ -181,6 +228,37 @@
             }
 
             return rowsAffected;
+        }
+
+        /// <summary>
+        /// The AddLocation
+        /// </summary>
+        /// <param name="location">The location<see cref="Location"/></param>
+        /// <returns>The <see cref="int"/></returns>
+        private int AddLocation(Location location)
+        {
+            string sql = $@"INSERT INTO [UserLocation] (UserId,Latitude,Longitude,City,Country,UpdatedOn) 
+                            VALUES (
+                                     {location.UserId},
+                                     {location.Latitude},
+                                     {location.Longitude},
+                                    '{location.City}',
+                                    '{location.Country}',                                    
+                                    '{DateTime.UtcNow}'
+                                   );
+                            SELECT CAST(SCOPE_IDENTITY() as int)";
+            int id = -1;
+            try
+            {
+                var connection = new SqlConnection(ConnectionString);
+                id = connection.Query<int>(sql).Single();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return id;
         }
 
         #endregion

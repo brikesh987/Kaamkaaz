@@ -15,24 +15,44 @@
     [ApiController]
     public class SerivceProviderController : ControllerBase
     {
+        #region Fields
+
+        /// <summary>
+        /// Defines the configuration
+        /// </summary>
         private readonly IConfiguration configuration;
+
+        /// <summary>
+        /// Defines the memoryCache
+        /// </summary>
         private readonly IMemoryCache memoryCache;
 
-        public SerivceProviderController(IConfiguration configuration, IMemoryCache  memoryCache)
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SerivceProviderController"/> class.
+        /// </summary>
+        /// <param name="configuration">The configuration<see cref="IConfiguration"/></param>
+        /// <param name="memoryCache">The memoryCache<see cref="IMemoryCache"/></param>
+        public SerivceProviderController(IConfiguration configuration, IMemoryCache memoryCache)
         {
             this.configuration = configuration;
             this.memoryCache = memoryCache;
         }
+
+        #endregion
+
         #region Methods
 
-        // GET: api/SerivceProvider
         /// <summary>
         /// The Get
         /// </summary>
         /// <param name="curLocation">The curLocation<see cref="ServiceProvidersRequest"/></param>
         /// <returns>The <see cref="IEnumerable{ServiceProvider}"/></returns>
         [HttpGet]
-        
+
         public IEnumerable<ServiceProvider> Get(ServiceProvidersRequest curLocation)
         {
             if (curLocation == null || !curLocation.IsValid())
@@ -40,7 +60,19 @@
                 return new List<ServiceProvider>();
             }
             List<ServiceProvider> response;
-            if (!memoryCache.TryGetValue(curLocation.GetCacheKey(),out response))
+            response = GetServiceProvidersNearby(curLocation);
+            return response;
+        }
+
+        /// <summary>
+        /// The GetServiceProvidersNearby
+        /// </summary>
+        /// <param name="curLocation">The curLocation<see cref="ServiceProvidersRequest"/></param>
+        /// <returns>The <see cref="List{ServiceProvider}"/></returns>
+        private List<ServiceProvider> GetServiceProvidersNearby(ServiceProvidersRequest curLocation)
+        {
+            List<ServiceProvider> response;
+            if (!memoryCache.TryGetValue(curLocation.GetCacheKey(), out response))
             {
                 // Set cache options.
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
@@ -49,6 +81,7 @@
                 response = service.GetNearbyServiceProviders(curLocation);
                 memoryCache.Set<List<ServiceProvider>>(curLocation.GetCacheKey(), response);
             }
+
             return response;
         }
 

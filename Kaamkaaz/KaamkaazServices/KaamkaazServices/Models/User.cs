@@ -14,5 +14,6 @@ namespace KaamkaazServices.Models
         public string AboutUser { get; set; } = string.Empty;
         public Location Location { get; set; } = new Location();
         public string UserId { get; set; } = string.Empty;
+        public int Id { get; set; }
     }
 }

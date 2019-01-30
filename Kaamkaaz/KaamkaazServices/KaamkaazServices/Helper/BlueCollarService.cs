@@ -52,7 +52,7 @@
         public List<ServiceProvider> GetNearbyServiceProviders(ServiceProvidersRequest request)
         {
             var repository = new BlueColorDB(connectionString);
-            var serviceprovidersInCity = repository.GetProvidersInCity(request.City);
+            List<Location> serviceprovidersInCity = repository.GetProvidersInCity(request.City);
             return GetNearestProviders(serviceprovidersInCity, request, repository);
         }
 
@@ -96,6 +96,7 @@
                             AboutUser = user.AboutUser,
                             Name = user.Name,
                             Phone = user.Phone,
+                            UserId = user.Id,
                             Service = JsonConvert.SerializeObject(user.ProfileData),
                             Location = new Location()
                             {
