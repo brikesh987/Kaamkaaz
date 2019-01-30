@@ -137,6 +137,31 @@
         }
 
         /// <summary>
+        /// The GetServices
+        /// </summary>
+        /// <param name="country">The country<see cref="string"/></param>
+        /// <returns>The <see cref="List{string}"/></returns>
+        public List<string> GetServices(string country)
+        {
+            string sql = $@"SELECT Services
+                            FROM Services
+                            WHERE Country = '{country}'                         
+                            ";
+            var services = new List<string>();
+            try
+            {
+                var connection = new SqlConnection(ConnectionString);
+                string serviceString = connection.Query<string>(sql).Single();
+                services = JsonConvert.DeserializeObject<List<string>>(serviceString);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return services;
+        }
+
+        /// <summary>
         /// The GetUser
         /// </summary>
         /// <param name="userId">The userId<see cref="string"/></param>
