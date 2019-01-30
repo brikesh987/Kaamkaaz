@@ -58,11 +58,6 @@
         [HttpGet]
         public IEnumerable<string> Get(string country)
         {
-            /*
-             * SQL to add services to table
-             Insert Into Services (Country, Services)
-                    values ('India','[''Cleaner'',''Plumber'']');
-             * */
             if (string.IsNullOrWhiteSpace(country))
             {
                 return new List<string>();
