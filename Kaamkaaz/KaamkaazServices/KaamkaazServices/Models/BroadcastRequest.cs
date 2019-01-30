@@ -7,8 +7,29 @@ namespace KaamkaazServices.Models
 {
     public class BroadcastRequest
     {
-        public Location CurrentLocation { get; set; }
-        public string ServiceRequested { get; set; }
-        public string MessageBody { get; set; }
+        public Location CurrentLocation { get; set; } = new Location();
+        public string ServiceRequested { get; set; } = string.Empty;
+        public string MessageBody { get; set; } = string.Empty;
+        public int UserId { get; set; }
+        public bool IsValid()
+        {
+            if (CurrentLocation == null || CurrentLocation.Latitude == 0 || CurrentLocation.Longitude == 0 || 
+                string.IsNullOrWhiteSpace(CurrentLocation.City) || string.IsNullOrWhiteSpace(CurrentLocation.Country)){
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(ServiceRequested))
+            {
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(MessageBody))
+            {
+                return false;
+            }
+            if (UserId <= 0)
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }

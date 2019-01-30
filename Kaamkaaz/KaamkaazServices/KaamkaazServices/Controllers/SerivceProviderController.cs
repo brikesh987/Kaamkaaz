@@ -3,7 +3,9 @@
     using KaamkaazServices.Helper;
     using KaamkaazServices.Models;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Caching.Memory;
     using Microsoft.Extensions.Configuration;
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -14,10 +16,12 @@
     public class SerivceProviderController : ControllerBase
     {
         private readonly IConfiguration configuration;
+        private readonly IMemoryCache memoryCache;
 
-        public SerivceProviderController(IConfiguration configuration)
+        public SerivceProviderController(IConfiguration configuration, IMemoryCache  memoryCache)
         {
             this.configuration = configuration;
+            this.memoryCache = memoryCache;
         }
         #region Methods
 
@@ -35,8 +39,17 @@
             {
                 return new List<ServiceProvider>();
             }
-            var service = new BlueCollarService(configuration.GetConnectionString("BlueColor"));
-            return service.GetNearbyServiceProviders(curLocation);
+            List<ServiceProvider> response;
+            if (!memoryCache.TryGetValue(curLocation.GetCacheKey(),out response))
+            {
+                // Set cache options.
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                                        .SetSlidingExpiration(TimeSpan.FromMinutes(4));
+                var service = new BlueCollarService(configuration.GetConnectionString("BlueColor"));
+                response = service.GetNearbyServiceProviders(curLocation);
+                memoryCache.Set<List<ServiceProvider>>(curLocation.GetCacheKey(), response);
+            }
+            return response;
         }
 
         #endregion

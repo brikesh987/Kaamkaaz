@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace KaamkaazServices.Models
@@ -18,6 +19,16 @@ namespace KaamkaazServices.Models
                 return true;
             }
             return false;
+        }
+        public string GetCacheKey()
+        {
+            var builder = new StringBuilder();
+            builder.Append(City);
+            builder.Append("_");
+            builder.Append(Latitude);
+            builder.Append("_");
+            builder.Append(Longitude);
+            return builder.ToString();
         }
     }
 }

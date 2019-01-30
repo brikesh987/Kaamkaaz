@@ -33,6 +33,31 @@
         /// </summary>
         public string ConnectionString { get; }
 
+        public bool UpdateLocation(Location location)
+        {
+            string sql = $@"INSERT INTO [UserLocation] (UserId,Latitude,Longitude,City,Country,UpdatedOn) 
+                            VALUES (
+                                     {location.UserId},
+                                     {location.Latitude},
+                                     {location.Longitude},
+                                    '{location.City}',
+                                    '{location.Country}',                                    
+                                    '{DateTime.UtcNow}'
+                                   );
+                            SELECT CAST(SCOPE_IDENTITY() as int)";
+            int id = -1;
+            try
+            {
+                var connection = new SqlConnection(ConnectionString);
+                id = connection.Query<int>(sql).Single();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return id > 0;
+        }
+
         #endregion
 
         #region Methods

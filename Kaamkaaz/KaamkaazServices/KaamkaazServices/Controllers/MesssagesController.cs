@@ -22,9 +22,15 @@ namespace KaamkaazServices.Controllers
 
         // POST: api/Messsage
         [HttpPost]
-        public void Post(BroadcastRequest broadcastMessage)
+        public ActionResult Post(BroadcastRequest broadcastMessage)
         {
             //TODO: Implement
+            if (broadcastMessage == null || !broadcastMessage.IsValid())
+            {
+                return BadRequest();
+            }
+            //Implement
+            return Ok();
         }
 
         
