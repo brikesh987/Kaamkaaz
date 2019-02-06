@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KaamkaazServices.Filters;
 using KaamkaazServices.Helper;
 using KaamkaazServices.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +13,8 @@ using Microsoft.Extensions.Configuration;
 namespace KaamkaazServices.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController]    
+    [Authorize(AuthenticationSchemes = "amx")]
     public class UsersController : ControllerBase
     {
         private readonly IConfiguration configuration;
@@ -28,14 +31,20 @@ namespace KaamkaazServices.Controllers
             //TODO: use options pattern
             this.configuration = configuration;
         }
+
+        //[HttpPost]
+        //public CreateUserResponse Post()
+        //{
+        //    return new CreateUserResponse();
+        //}
         // POST: api/User
-        [HttpPost]
+        [HttpPost]           
         public CreateUserResponse Post(User user)
         {
             //Create new user
             var repository = new BlueColorDB(configuration.GetConnectionString("BlueColor"));
             var userId = Guid.NewGuid().ToString();
-            var id = repository.CreateUser(user,userId);
+            var id = repository.CreateUser(user, userId);
 
             return new CreateUserResponse() { Success = id > 0 };
         }
@@ -44,6 +53,18 @@ namespace KaamkaazServices.Controllers
         [HttpPut]
         public CreateUserResponse Put(User user)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.SelectMany(v => v.Value.Errors.Select(e => e.Exception));
+
+                List<String> messages = new List<string>();
+
+                foreach (Exception e in errors)
+                {
+                    messages.Add(e.GetType().ToString() + ": " + e.Message);
+                }
+
+            }
             if (user == null || string.IsNullOrWhiteSpace(user.UserId))
             {
                 return new CreateUserResponse() { Success = false, Message = "UserId is required." };

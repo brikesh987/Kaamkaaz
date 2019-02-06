@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using KaamkaazServices.Filters;
 using KaamkaazServices.Helper;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
@@ -28,9 +31,15 @@ namespace KaamkaazServices
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                //.AddMvcOptions(opt => opt.Filters.Add(new ValidModelsOnlyFilter()));
+                        //.AddMvcOptions(options => options.Filters.Add(new HMACAuthorizationFilter()));
+            services.AddAuthentication("amx")
+                        .AddScheme<HawkAuthenticationOptions, HawkAuthenticationHandler>("amx", null);
             SqlMapper.AddTypeHandler(typeof(List<string>), new JsonObjectTypeHandler());
-            var con = Configuration.GetConnectionString("BlueColor");
+            var con = Configuration.GetConnectionString("BlueColor");          
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,8 +54,20 @@ namespace KaamkaazServices
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
-            app.UseMvc();
-        }
-    }
+            app.UseHttpsRedirection();            
+            app.UseMvc();            
+            app.UseExceptionHandler(appError => {
+                appError.Run(async context =>
+                {
+                    var errorFeature = context.Features.Get<IExceptionHandlerFeature>();
+                    var exception = errorFeature.Error;
+                    File.WriteAllText("error.txt", exception.ToString());
+
+                    // log the exception etc..
+                    // produce some response for the caller
+                });
+            });
+                
+         }
+     }
 }

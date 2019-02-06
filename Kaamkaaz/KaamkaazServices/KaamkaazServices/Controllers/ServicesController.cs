@@ -1,6 +1,8 @@
 ﻿namespace KaamkaazServices.Controllers
 {
+    using KaamkaazServices.Filters;
     using KaamkaazServices.Helper;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Caching.Memory;
     using Microsoft.Extensions.Configuration;
@@ -11,6 +13,7 @@
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "amx")]
     public class ServicesController : ControllerBase
     {
         #region Fields
@@ -56,6 +59,7 @@
         /// <param name="country">The country<see cref="string"/></param>
         /// <returns>The <see cref="IEnumerable{string}"/></returns>
         [HttpGet]
+        
         public IEnumerable<string> Get(string country)
         {
             if (string.IsNullOrWhiteSpace(country))
