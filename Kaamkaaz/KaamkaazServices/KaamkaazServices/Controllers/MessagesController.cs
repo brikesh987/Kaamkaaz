@@ -61,7 +61,7 @@ namespace KaamkaazServices.Controllers
                 memoryCache.Set<List<ServiceProvider>>(key, providersNearby);
             }
             //Add the message to be sent to each of the nearby provider;
-            providersNearby.ForEach(x => repository.AddMessageRecipient(messageId, x.UserId));
+            providersNearby.Where(y => y.UserId  != broadcastMessage.UserId).ToList().ForEach(x => repository.AddMessageRecipient(messageId, x.UserId));
             return Ok();
         }
 

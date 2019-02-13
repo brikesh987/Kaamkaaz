@@ -6,8 +6,9 @@
     using System;
     using System.Collections.Generic;
     using System.Net.Http;
+    using System.Net.Http.Headers;
     using System.Threading.Tasks;
-    using Xamarin.Forms.Internals;    
+    using Xamarin.Forms.Internals;
 
     /// <summary>
     /// Defines the <see cref="KaamkaazService" />
@@ -23,7 +24,18 @@
         /// <returns>The <see cref="bool"/></returns>
         public static bool Broadcast(BroadcastMessage message)
         {
-            return true;
+            bool result = false;
+            try
+            {
+                result = AsyncHelper.RunSync<bool>(() => SendMessage(message));
+            }
+            catch (Exception ex)
+            {
+                Log.Warning("Servicces", $"Unexpected error sending message for broadcast: {ex.Message}");
+            }
+
+            //List<string> result = GetServiceAsync(country).ConfigureAwait(false).GetAwaiter().GetResult();
+            return result;
         }
 
         /// <summary>
@@ -76,6 +88,33 @@
                 list = JsonConvert.DeserializeObject<List<string>>(responseString);
             }
             return list;
+        }
+
+        /// <summary>
+        /// The SendMessage
+        /// </summary>
+        /// <param name="message">The message<see cref="BroadcastMessage"/></param>
+        /// <returns>The <see cref="Task{bool}"/></returns>
+        private static async Task<bool> SendMessage(BroadcastMessage message)
+        {
+
+            CustomDelegatingHandler customDelegatingHandler = new CustomDelegatingHandler();
+
+            HttpClient client = HttpClientFactory.Create(customDelegatingHandler);
+
+            string postBody = JsonConvert.SerializeObject(message);
+
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            HttpResponseMessage response = await client.PostAsJsonAsync<BroadcastMessage>(AppConstants.AppBaseAddress + "/api/Messages", message); ;
+
+            if (response.IsSuccessStatusCode)
+            {
+                string responseString = await response.Content.ReadAsStringAsync();
+
+                return true;
+            }
+            return false;
         }
 
         #endregion
