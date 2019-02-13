@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using KaamkaazServices.Helper;
 using KaamkaazServices.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -33,6 +35,7 @@ namespace KaamkaazServices.Controllers
 
         // POST: api/Messsage
         [HttpPost]
+        [Authorize(AuthenticationSchemes = "amx")]
         public ActionResult Post(BroadcastRequest broadcastMessage)
         {
             //TODO: Implement
