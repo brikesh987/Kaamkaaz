@@ -18,20 +18,23 @@ namespace Kaamkaaz.Droid
     using Android.Views.InputMethods;
     using Android.Widget;
     using Kaamkaaz.Droid.Helpers;
-    using Kaamkaaz.Models;
+    using Kaamkaaz.Helpers;    
     using Kaamkaaz.Services;
     using Nito.AsyncEx.Synchronous;
     using Plugin.Geolocator;
     using Plugin.Geolocator.Abstractions;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Xamarin.Essentials;
+    using Models = Kaamkaaz.Models;
 
     /// <summary>
     /// Defines the <see cref="MainActivity" />
     /// </summary>
-    [Activity(Label = "Kaamkaaz", Icon = "@mipmap/icon", MainLauncher = true, Theme = "@style/MainTheme", ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "BlueCollar", Icon = "@mipmap/icon", MainLauncher = true, Theme = "@style/MainTheme", ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : Android.Support.V7.App.AppCompatActivity, IOnMapReadyCallback
     {
         #region Fields
@@ -148,7 +151,8 @@ namespace Kaamkaaz.Droid
 
             //var adapter = ArrayAdapter.CreateFromResource(
             //        this, Resource.Array.planets_array, Android.Resource.Layout.SimpleSpinnerDropDownItem);
-            var adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleSpinnerDropDownItem, KaamkaazService.GetSericeTypes("India"));
+            var userLocation = GeUsertLocation();
+            var adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleSpinnerDropDownItem, KaamkaazService.GetSericeTypes(userLocation.Country));
 
             adapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
             spinner.Adapter = adapter;
@@ -174,12 +178,46 @@ namespace Kaamkaaz.Droid
         private void BroadcastMessage()
         {
             Spinner spinner = FindViewById<Spinner>(Resource.Id.spinner);
-            var message = new BroadcastMessage();
-            message.RequestedService = spinner.SelectedItem.ToString();
+            var message = new Models.BroadcastMessage();
+            message.ServiceRequested = spinner.SelectedItem.ToString();
             var requestMessageText = FindViewById<EditText>(Resource.Id.edittext);
-            message.Message = requestMessageText.Text;
+            message.MessageBody = requestMessageText.Text;
+            //TODO: remove hard coded user Id
+            message.UserId = 5;
+            message.CurrentLocation = GeUsertLocation();
             KaamkaazService.Broadcast(message);
             Task.Delay(50000);
+        }
+
+        private Models.Location GeUsertLocation()
+        {
+            var locator = CrossGeolocator.Current;
+            locator.DesiredAccuracy = 102;
+            if (locator.IsGeolocationAvailable)
+            {
+                var positionTask = locator.GetLastKnownLocationAsync();
+                positionTask.WaitAndUnwrapException();
+                if (positionTask.Result == null)
+                {
+                    Log.Debug("Kaamkaz GeoLocation", "Location service failed to return last known location");
+                    return new Models.Location();
+                }
+                
+                var location = new Models.Location() { Latitude = positionTask.Result.Latitude, Longitude = positionTask.Result.Longitude };
+                //Get city and Contry
+                //Get city and contry info
+                var places = AsyncHelper.RunSync<IEnumerable<Placemark>>(() => Geocoding.GetPlacemarksAsync(location.Latitude, location.Longitude));
+                var placeMark = places?.FirstOrDefault();
+                if (placeMark != null)
+                {
+                    location.City = placeMark.Locality;
+                    location.Country = placeMark.CountryName;
+                }
+
+                return location;
+            }
+            Log.Debug("Kaamkaz GeoLocation", "Location service is not available. Unable to get current user location.");
+            return new Models.Location();
         }
 
         /// <summary>

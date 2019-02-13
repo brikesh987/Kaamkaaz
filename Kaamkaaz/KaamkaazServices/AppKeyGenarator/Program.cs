@@ -25,8 +25,8 @@ namespace AppKeyGenarator
             }
             Console.Read();
             */
-            //RunAsync().Wait();
-           PostAsync().Wait();
+            RunAsync().Wait();
+           //PostAsync().Wait();
         }
         static async Task RunAsync()
         {
