@@ -20,12 +20,14 @@ namespace Kaamkaaz.Droid
     using Kaamkaaz.Droid.Helpers;
     using Kaamkaaz.Helpers;    
     using Kaamkaaz.Services;
+    using Newtonsoft.Json;
     using Nito.AsyncEx.Synchronous;
     using Plugin.Geolocator;
     using Plugin.Geolocator.Abstractions;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using Xamarin.Essentials;
@@ -250,10 +252,112 @@ namespace Kaamkaaz.Droid
         }
 
         /// <summary>
+        /// The SetPosition
+        /// </summary>
+        /// <param name="position">The position<see cref="Task{Position}"/></param>
+        /// <param name="gmap">The gmap<see cref="GoogleMap"/></param>
+        private void SetPosition(Task<Position> position, GoogleMap gmap)
+        {
+            if (position.Result == null)
+            {
+                Log.Debug("Kaamkaz GeoLocation", "Location service failed to return last known location");
+                return;
+            }
+            LatLng location = new LatLng(position.Result.Latitude, position.Result.Longitude);
+            //Add circle
+            int strokeColor = Int32.Parse("335AFF", System.Globalization.NumberStyles.HexNumber);
+            int fillColor = Int32.Parse("33BAFF", System.Globalization.NumberStyles.HexNumber);
+            CircleOptions circleOptions = new CircleOptions();
+            circleOptions.InvokeCenter(location)
+                .InvokeRadius(20)   //Radius is in meters
+                .InvokeStrokeWidth(4)
+                .InvokeStrokeColor(strokeColor)
+                .InvokeFillColor(fillColor);
+
+            circleOptions.Visible(true);
+            gmap.AddCircle(circleOptions);
+
+            CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
+            builder.Target(location);
+            builder.Zoom(14);
+            builder.Bearing(155);
+            builder.Tilt(50);
+
+            CameraPosition cameraPosition = builder.Build();
+            CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
+            gmap.MoveCamera(cameraUpdate);
+
+            gmap.Clear();
+            var youMarker = new MarkerOptions();
+            youMarker.SetPosition(location);
+            //TODO: Remove hard coded name you can show the circle
+            youMarker.SetTitle("Brikesh Kumar");
+            youMarker.SetSnippet("Brikesh Kumar");
+            gmap.AddMarker(youMarker);
+
+            //Add pins/neighbors
+            var pins = GetNeighbors(location);
+            gmap.SetInfoWindowAdapter(new WindowAdapter(LayoutInflater));
+            pins.ForEach(x => gmap.AddMarker(x));
+
+        }
+
+        private List<MarkerOptions> GetNeighbors(LatLng location)
+        {
+            //Get the Neighbors
+            //TODO: Remove hard coded UserId
+            Models.Location userLoc = GeUsertLocation();
+            List<Models.ServiceProvider> providers =  KaamkaazService.GetServiceProviders(userLoc, userId:5);
+            //Working Here
+            //Create Markers for them
+            var list = new List<MarkerOptions>();
+            foreach(var provider in providers)
+            {
+                var marker = new MarkerOptions();
+                marker.SetTitle(GetServiceProviderTitle(provider));
+                marker.SetPosition(new LatLng(provider.Location.Latitude, provider.Location.Longitude));
+                marker.Visible(true);
+                list.Add(marker);
+            }           
+            return list;
+        }
+
+        private string GetServiceProviderTitle(Models.ServiceProvider provider)
+        {
+            var titleBuilder = new StringBuilder();
+            try
+            {
+                titleBuilder.AppendLine(provider.Name);
+                titleBuilder.AppendLine($"Ph:{provider.Phone}");
+                titleBuilder.AppendLine($"Services:{GetServiceString(provider.Service)}");
+            }catch(Exception ex)
+            {
+                Log.Error("GetServiceProviderTitle", $"Unexpected error in getting the service provider details:{ex.Message}");
+            }
+            return titleBuilder.ToString();
+        }
+
+        private string GetServiceString(string service)
+        {
+            string services = "";
+            try
+            {
+                var serviceList = JsonConvert.DeserializeObject<List<string>>(service);
+                services = string.Join(',', serviceList);
+
+            }
+            catch(Exception ex)
+            {
+                Log.Error("GetServiceString", $"Unexpected error in geting the services offered by the provider:{ex.Message}");
+            }
+            return services;
+        }
+
+        /// <summary>
         /// The GetLocationWithNeighbor
         /// </summary>
         /// <param name="map">The map<see cref="GoogleMap"/></param>
-        private void GetLocationWithNeighbor(GoogleMap map)
+        private void GetLocationWithNeighbor_HardCoded(GoogleMap map)
         {
             LatLng location = new LatLng(23.667613, 86.151678);
             CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
@@ -290,7 +394,7 @@ namespace Kaamkaaz.Droid
             map.AddCircle(circleOptions);
 
             //Add pins/neighbors
-            var pins = GetNeighbors(location);
+            var pins = GetNeighbors_HardCoded(location);
             map.SetInfoWindowAdapter(new WindowAdapter(LayoutInflater));
             pins.ForEach(x => map.AddMarker(x));
         }
@@ -300,7 +404,7 @@ namespace Kaamkaaz.Droid
         /// </summary>
         /// <param name="location">The location<see cref="LatLng"/></param>
         /// <returns>The <see cref="List{MarkerOptions}"/></returns>
-        private List<MarkerOptions> GetNeighbors(LatLng location)
+        private List<MarkerOptions> GetNeighbors_HardCoded(LatLng location)
         {
             var list = new List<MarkerOptions>();
             var marker1 = new MarkerOptions();
@@ -386,50 +490,7 @@ namespace Kaamkaaz.Droid
                 ActivityCompat.RequestPermissions(this, new String[] { Manifest.Permission.AccessCoarseLocation, Manifest.Permission.AccessFineLocation }, 0);
             }
         }
-
-        /// <summary>
-        /// The SetPosition
-        /// </summary>
-        /// <param name="position">The position<see cref="Task{Position}"/></param>
-        /// <param name="gmap">The gmap<see cref="GoogleMap"/></param>
-        private void SetPosition(Task<Position> position, GoogleMap gmap)
-        {
-            if (position.Result == null)
-            {
-                Log.Debug("Kaamkaz GeoLocation", "Location service failed to return last known location");
-                return;
-            }
-            LatLng location = new LatLng(position.Result.Latitude, position.Result.Longitude);
-            //Add circle
-            int strokeColor = Int32.Parse("335AFF", System.Globalization.NumberStyles.HexNumber);
-            int fillColor = Int32.Parse("33BAFF", System.Globalization.NumberStyles.HexNumber);
-            CircleOptions circleOptions = new CircleOptions();
-            circleOptions.InvokeCenter(location)
-                .InvokeRadius(20)   //Radius is in meters
-                .InvokeStrokeWidth(4)
-                .InvokeStrokeColor(strokeColor)
-                .InvokeFillColor(fillColor);
-
-            circleOptions.Visible(true);
-            gmap.AddCircle(circleOptions);
-
-            CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
-            builder.Target(location);
-            builder.Zoom(14);
-            builder.Bearing(155);
-            builder.Tilt(50);
-
-            CameraPosition cameraPosition = builder.Build();
-            CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
-            gmap.MoveCamera(cameraUpdate);
-
-            gmap.Clear();
-            var youMarker = new MarkerOptions();
-            youMarker.SetPosition(location);
-            youMarker.SetTitle("Brikesh Kumar");
-            youMarker.SetSnippet("Brikesh Kumar");
-            gmap.AddMarker(youMarker);
-        }
+        
 
         /// <summary>
         /// The SetPostionToLastLocation

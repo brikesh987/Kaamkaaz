@@ -16,6 +16,37 @@
     public static class KaamkaazService
     {
         #region Methods
+        public static List<ServiceProvider> GetServiceProviders(Location curLocation, int userId)
+        {
+            var providers = new List<ServiceProvider>();
+            try
+            {
+                providers = AsyncHelper.RunSync<List<ServiceProvider>>(() => GetServicePrividersAsync(curLocation,userId));
+            } catch(Exception ex)
+            {
+                Log.Warning("Servicces", $"Unexpected error getting service providers: {ex.Message}");
+            }
+            return providers;
+        }
+
+        private static async Task<List<ServiceProvider>> GetServicePrividersAsync(Location curLocation,int userId)
+        {
+            var list = new List<ServiceProvider>();
+            CustomDelegatingHandler customDelegatingHandler = new CustomDelegatingHandler();
+
+            HttpClient client = HttpClientFactory.Create(customDelegatingHandler);
+            client.DefaultRequestHeaders.ExpectContinue = false;
+            
+            HttpResponseMessage response = await client.GetAsync($"{AppConstants.AppBaseAddress}/api/SerivceProvider?Latitude={curLocation.Latitude}&Longitude={curLocation.Longitude}&City={curLocation.City}&UserId={userId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                string responseString = await response.Content.ReadAsStringAsync();
+
+                list = JsonConvert.DeserializeObject<List<ServiceProvider>>(responseString);
+            }
+            return list;
+        }
 
         /// <summary>
         /// The Broadcast

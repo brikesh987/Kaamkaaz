@@ -7,6 +7,7 @@
     using Microsoft.Extensions.Configuration;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// Defines the <see cref="SerivceProviderController" />
@@ -53,7 +54,7 @@
         /// <returns>The <see cref="IEnumerable{ServiceProvider}"/></returns>
         [HttpGet]
 
-        public IEnumerable<ServiceProvider> Get(ServiceProvidersRequest curLocation)
+        public IEnumerable<ServiceProvider> Get([FromQuery]ServiceProvidersRequest curLocation)
         {
             if (curLocation == null || !curLocation.IsValid())
             {
@@ -79,6 +80,7 @@
                                         .SetSlidingExpiration(TimeSpan.FromMinutes(4));
                 var service = new BlueCollarService(configuration.GetConnectionString("BlueColor"));
                 response = service.GetNearbyServiceProviders(curLocation);
+                response = response.Where(x => x.UserId != curLocation.UserId).ToList();
                 memoryCache.Set<List<ServiceProvider>>(curLocation.GetCacheKey(), response);
             }
 

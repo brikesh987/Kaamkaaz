@@ -12,6 +12,7 @@ namespace KaamkaazServices.Models
         public double Longitude { get; set; }
         public string Service { get; set; }
         public string City { get; set; }
+        public int UserId { get; set; }
         public bool IsValid()
         {
             if (Latitude != 0 && Longitude != 0 && !string.IsNullOrWhiteSpace(City))
