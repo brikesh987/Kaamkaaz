@@ -9,6 +9,7 @@
     using Android.Views;
     using Android.Views.InputMethods;
     using Android.Widget;
+    using Kaamkaaz.Droid.Helpers;
     using Kaamkaaz.Models;
     using Kaamkaaz.Services;
     using System;
@@ -56,6 +57,9 @@
                 SetContentView(Resource.Layout.registeruser);
                 FloatingActionButton sendButton = FindViewById<FloatingActionButton>(Resource.Id.btnregister);
                 sendButton.Click += delegate { btn_Register(); };
+                //TODO: Remove the set call. It should be done after the login once
+                Cache.SetUserId(5);
+                Profile userProfile = KaamkaazService.GetUser(Cache.GetUserId());
                 //Set tool bar
                 var toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
                 SetSupportActionBar(toolbar);
@@ -66,15 +70,103 @@
                 //clear focus and set char limit
                 var nameText = FindViewById<EditText>(Resource.Id.username);
                 nameText.SetFilters(new IInputFilter[] { new InputFilterLengthFilter(70) });
-                nameText.ClearFocus();
+                nameText.FocusChange += (sender, e) =>
+                {
 
+                    if (TextUtils.IsEmpty((sender as EditText).Text))
+                    {
+                        nameText.SetError("Name can't be empty.", null);
+
+                    }
+                };
+                nameText.ClearFocus();
+                nameText.Text = userProfile.Name;
                 var phoneText = FindViewById<EditText>(Resource.Id.phonenumber);
                 phoneText.SetFilters(new IInputFilter[] { new InputFilterLengthFilter(10) });
+                phoneText.FocusChange += (sender, e) =>
+                {
+
+                    if (TextUtils.IsEmpty((sender as EditText).Text))
+                    {
+                        phoneText.SetError("Valid phone number required.", null);
+
+                    }
+                };
                 phoneText.ClearFocus();
+                phoneText.Text = userProfile.Phone;
+                SetServicesProvided(userProfile);
             }
             catch (Exception ex)
             {
                 Log.Error("Register:", $"Unexpected error :{ex.Message}");
+            }
+        }
+
+        private void SetServicesProvided(Profile userProfile)
+        {
+            foreach(var service in userProfile.ProfileData)
+            {
+                //TODO: Find the service in the resource switch and make it checked
+                if (service == "Auto-riksha")
+                {
+                    var auto = FindViewById<Switch>(Resource.Id.auto);
+                    auto.Checked = true;
+                }
+                if (service == "Electrician")
+                {
+                    var auto = FindViewById<Switch>(Resource.Id.electrician);
+                    auto.Checked = true;
+                }
+                if (service == "Plumber")
+                {
+                    var auto = FindViewById<Switch>(Resource.Id.plumber);
+                    auto.Checked = true;
+                }
+                if (service == "Taxi")
+                {
+                    var auto = FindViewById<Switch>(Resource.Id.taxi);
+                    auto.Checked = true;
+                }
+                if (service == "Driver")
+                {
+                    var auto = FindViewById<Switch>(Resource.Id.driver);
+                    auto.Checked = true;
+                }
+                if (service == "Housemaid")
+                {
+                    var auto = FindViewById<Switch>(Resource.Id.maid);
+                    auto.Checked = true;
+                }
+                if (service == "Grocery Store")
+                {
+                    var auto = FindViewById<Switch>(Resource.Id.grocery);
+                    auto.Checked = true;
+                }
+                if (service == "Painter")
+                {
+                    var auto = FindViewById<Switch>(Resource.Id.painter);
+                    auto.Checked = true;
+                }
+                if (service == "Caterer")
+                {
+                    var auto = FindViewById<Switch>(Resource.Id.caterer);
+                    auto.Checked = true;
+                }
+                if (service == "Mechanic")
+                {
+                    var auto = FindViewById<Switch>(Resource.Id.mechanic);
+                    auto.Checked = true;
+                }
+                if (service == "Tutor")
+                {
+                    var auto = FindViewById<Switch>(Resource.Id.tutor);
+                    auto.Checked = true;
+                }
+                if (service == "Volunteer")
+                {
+                    var auto = FindViewById<Switch>(Resource.Id.volunteer);
+                    auto.Checked = true;
+                }
             }
         }
 
@@ -131,65 +223,73 @@
         /// </summary>
         private void SaveProfile()
         {
-            var txtName = FindViewById<EditText>(Resource.Id.textName);
-            var txtPhone = FindViewById<EditText>(Resource.Id.textPhone);
+            var txtName = FindViewById<EditText>(Resource.Id.username);
+            var txtPhone = FindViewById<EditText>(Resource.Id.phonenumber);
             var profile = new Profile();
+            profile.Name = txtName.Text;
+            profile.Phone = txtPhone.Text;
             List<string> services = new List<string>();
             var auto = FindViewById<Switch>(Resource.Id.auto);
             if (auto.Checked)
             {
-                profile.Services.Add(auto.Text);
+                profile.ProfileData.Add(auto.Text);
             }
             var drive = FindViewById<Switch>(Resource.Id.driver);
             if (drive.Checked)
             {
-                profile.Services.Add(drive.Text);
+                profile.ProfileData.Add(drive.Text);
             }
             var electrician = FindViewById<Switch>(Resource.Id.electrician);
             if (electrician.Checked)
             {
-                profile.Services.Add(electrician.Text);
+                profile.ProfileData.Add(electrician.Text);
             }
             var grocery = FindViewById<Switch>(Resource.Id.grocery);
             if (electrician.Checked)
             {
-                profile.Services.Add(grocery.Text);
+                profile.ProfileData.Add(grocery.Text);
             }
             var maid = FindViewById<Switch>(Resource.Id.maid);
             if (maid.Checked)
             {
-                profile.Services.Add(maid.Text);
+                profile.ProfileData.Add(maid.Text);
             }
             var mechanic = FindViewById<Switch>(Resource.Id.mechanic);
             if (mechanic.Checked)
             {
-                profile.Services.Add(mechanic.Text);
+                profile.ProfileData.Add(mechanic.Text);
             }
             var plumber = FindViewById<Switch>(Resource.Id.plumber);
             if (plumber.Checked)
             {
-                profile.Services.Add(plumber.Text);
+                profile.ProfileData.Add(plumber.Text);
             }
             var painter = FindViewById<Switch>(Resource.Id.painter);
             if (painter.Checked)
             {
-                profile.Services.Add(painter.Text);
+                profile.ProfileData.Add(painter.Text);
             }
             var taxi = FindViewById<Switch>(Resource.Id.taxi);
             if (taxi.Checked)
             {
-                profile.Services.Add(taxi.Text);
+                profile.ProfileData.Add(taxi.Text);
             }
             var tutor = FindViewById<Switch>(Resource.Id.tutor);
             if (tutor.Checked)
             {
-                profile.Services.Add(tutor.Text);
+                profile.ProfileData.Add(tutor.Text);
             }
             var volunteer = FindViewById<Switch>(Resource.Id.volunteer);
             if (volunteer.Checked)
             {
-                profile.Services.Add(volunteer.Text);
+                profile.ProfileData.Add(volunteer.Text);
             }
+            var caterer = FindViewById<Switch>(Resource.Id.caterer);
+            if (caterer.Checked)
+            {
+                profile.ProfileData.Add(caterer.Text);
+            }
+            profile.Id = Cache.GetUserId();
             KaamkaazService.SaveProfile(profile);
         }
 

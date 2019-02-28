@@ -240,7 +240,7 @@
                                  Name = '{user.Name}',
                                  Phone = '{user.Phone}',
                                  AboutUser = '{user.AboutUser}'
-                            WHERE UserId = '{user.UserId}';";
+                            WHERE Id = {user.Id};";
             var rowsAffected = -1;
             try
             {

@@ -6,8 +6,9 @@ namespace Kaamkaaz.Models
 {
     public class Profile
     {
-        public string Name { get; set; }
-        public string Phone { get; set; }
-        public List<string> Services { get; set; } = new List<string>();
+        public string Name { get; set; } = "";
+        public string Phone { get; set; } = "";
+        public List<string> ProfileData { get; set; } = new List<string>();
+        public int Id { get; set; }
     }
 }

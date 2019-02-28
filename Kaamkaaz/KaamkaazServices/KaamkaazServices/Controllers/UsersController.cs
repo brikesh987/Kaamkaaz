@@ -65,7 +65,7 @@ namespace KaamkaazServices.Controllers
                 }
 
             }
-            if (user == null || string.IsNullOrWhiteSpace(user.UserId))
+            if (user == null || user.Id <= 0)
             {
                 return new CreateUserResponse() { Success = false, Message = "UserId is required." };
             }

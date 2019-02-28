@@ -62,11 +62,43 @@
             }
             catch (Exception ex)
             {
-                Log.Warning("Servicces", $"Unexpected error sending message for broadcast: {ex.Message}");
+                Log.Warning("Service", $"Unexpected error sending message for broadcast: {ex.Message}");
             }
 
             //List<string> result = GetServiceAsync(country).ConfigureAwait(false).GetAwaiter().GetResult();
             return result;
+        }
+
+        public static Profile GetUser(int userId)
+        {
+            var user = new Profile();
+            try
+            {
+                user = AsyncHelper.RunSync<Profile>(() => GetUserAsync(userId));
+            }
+            catch (Exception ex)
+            {
+                Log.Warning("Service", $"Unexpected error getting user information: {ex.Message}");
+            }
+            return user;
+        }
+
+        private static async Task<Profile> GetUserAsync(int userId)
+        {
+            var user = new Profile();
+            CustomDelegatingHandler customDelegatingHandler = new CustomDelegatingHandler();
+
+            HttpClient client = HttpClientFactory.Create(customDelegatingHandler);
+            client.DefaultRequestHeaders.ExpectContinue = false;
+            HttpResponseMessage response = await client.GetAsync($"{AppConstants.AppBaseAddress}/api/Users?id={userId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                string responseString = await response.Content.ReadAsStringAsync();
+
+                user = JsonConvert.DeserializeObject<Profile>(responseString);
+            }
+            return user;
         }
 
         /// <summary>
@@ -83,7 +115,7 @@
             }
             catch (Exception ex)
             {
-                Log.Warning("Servicces", $"Unexpected error getting service types: {ex.Message}");
+                Log.Warning("Service", $"Unexpected error getting service types: {ex.Message}");
             }
 
             //List<string> result = GetServiceAsync(country).ConfigureAwait(false).GetAwaiter().GetResult();
@@ -94,8 +126,43 @@
         /// The SaveProfile
         /// </summary>
         /// <param name="profile">The profile<see cref="Profile"/></param>
-        public static void SaveProfile(Profile profile)
+        public static bool SaveProfile(Profile profile)
         {
+            var result = false;
+            try
+            {
+                result = AsyncHelper.RunSync<bool>(() => SaveProfileAsync(profile));
+            }
+            catch (Exception ex)
+            {
+                Log.Warning("Service", $"Unexpected error sending saving user profile: {ex.Message}");
+            }
+            return result;
+        }
+
+        private static async Task<bool> SaveProfileAsync(Profile profile)
+        {
+            CustomDelegatingHandler customDelegatingHandler = new CustomDelegatingHandler();
+
+            HttpClient client = HttpClientFactory.Create(customDelegatingHandler);
+
+            string postBody = JsonConvert.SerializeObject(profile);
+
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            HttpResponseMessage response = await client.PutAsJsonAsync<Profile>(AppConstants.AppBaseAddress + "/api/Users", profile); ;
+
+            if (response.IsSuccessStatusCode)
+            {
+                string responseString = await response.Content.ReadAsStringAsync();
+                var serverResult = JsonConvert.DeserializeObject<UserResponse>(responseString);
+                if (serverResult.Success)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
         }
 
         /// <summary>
